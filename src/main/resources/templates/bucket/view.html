@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/bootstrap.html}">
+<head>
+  <title th:text="${bucket.getTitle()}"></title>
+</head>
+<div class="container" layout:fragment="content">
+  <main class="container">
+    <div class="jumbotron bg-dark text-light text-center py-5">
+      <h1 th:text="${bucket.getTitle()}" class="display-1"></h1>
+      <div class="display-5">Until <span th:text="${#temporals.format(bucket.getDueTo(), 'yyyy-MM-dd HH:mm')}" /></div>
+      <div>
+        <th:block th:switch="${bucket.getBadge()}">
+          <span th:case="${'expired'}" class="badge text-bg-warning" style="vertical-align: text-top">Expired</span>
+          <span th:case="${'finished'}" class="badge text-bg-success" style="vertical-align: text-top">Finished</span>
+          <span th:case="${'dropped'}" class="badge text-bg-danger" style="vertical-align: text-top">Dropped</span>
+        </th:block>
+      </div>
+    </div>
+    <div id="bucket-md" class="p-3 rounded" th:text="${bucket.getDescription()}"></div>
+  </main>
+  <nav class="mt-4">
+    <div class="d-flex justify-content-between">
+      <a th:href="@{'/bucket' + ${requestDTO.useQuery()}}" class="btn btn-secondary">Back to List</a>
+      <a th:href="@{'/bucket/edit/' + ${bucket.getId()} + ${requestDTO.useQuery()}}" class="btn btn-warning">Edit</a>
+      <button id="DeleteButton" class="btn btn-danger">Delete</button>
+    </div>
+  </nav>
+</div>
+<th:block layout:fragment="script">
+  <script th:inline="javascript">
+
+    function deleteAction() {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = /*[[${deleteAction}]]*/ '';
+      document.body.appendChild(form);
+      form.submit();
+    }
+    document.getElementById('DeleteButton').addEventListener('click', e => {
+      if (window.confirm('Are you sure you want to delete this bucket?')) {
+        deleteAction();
+      }
+    });
+  </script>
+</th:block>
+</html>

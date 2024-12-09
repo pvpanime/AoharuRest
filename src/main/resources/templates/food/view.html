@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/bootstrap.html}">
+<head>
+  <title>Foods!</title>
+</head>
+<th:block layout:fragment="style">
+  <style>
+    #reviews-here:empty::after {
+        text-align: center;
+        content: '리뷰 없음';
+        font-size: 1.5rem;
+        display: block;
+        padding: 1rem;
+        opacity: 0.5;
+    }
+    #review-paginator-here:empty {
+        display: none;
+    }
+    img {
+        max-width: 100%;
+    }
+  </style>
+</th:block>
+<div layout:fragment="content" class="container">
+  <div class="modal fade" id="reviewEditModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Review</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="reviewEditForm">
+          <div class="modal-body">
+            <div class="mb-2">
+              <div>Rating</div>
+              <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                <input type="radio" class="btn-check" name="rating" value="1" id="er1" autocomplete="off">
+                <label class="btn btn-outline-warning" for="er1">1</label>
+                <input type="radio" class="btn-check" name="rating" value="2" id="er2" autocomplete="off">
+                <label class="btn btn-outline-warning" for="er2">2</label>
+                <input type="radio" class="btn-check" name="rating" value="3" id="er3" autocomplete="off">
+                <label class="btn btn-outline-warning" for="er3">3</label>
+                <input type="radio" class="btn-check" name="rating" value="4" id="er4" autocomplete="off">
+                <label class="btn btn-outline-warning" for="er4">4</label>
+                <input type="radio" class="btn-check" name="rating" value="5" id="er5" autocomplete="off">
+                <label class="btn btn-outline-warning" for="er5">5</label>
+              </div>
+            </div>
+            <div class="form-floating">
+              <textarea id="commentEditTA" name="comment" class="form-control" placeholder="Leave a Comment" style="height: 200px;"></textarea>
+              <label for="commentEditTA">Leave a Comment</label>
+            </div>
+          </div>
+        </form>
+        <div class="modal-footer justify-content-between">
+          <div class="col-auto">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button id="reviewEditButton" type="button" class="btn btn-primary">Edit</button>
+          </div>
+          <div class="col-auto">
+            <button id="reviewDeleteButton" type="button" class="btn btn-danger">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="jumbotron display-1 text-center py-4">
+    Foods!
+  </div>
+  <div class="card mb-2">
+    <div class="card-header">
+      <h1 th:text="${food.getName()}"></h1>
+    </div>
+    <div class="card-body">
+      <h3 class="card-title" th:text="${food.getPrice() + '원'}"></h3>
+      <h4 th:if="${food.getAvgRate() != null}" class="card-subtitle mb-2 text-body-secondary">
+        <i class="bi bi-star-fill" style="color: #ffc614"></i>
+        <span style="color: #ffc614" th:text="${#numbers.formatDecimal(food.getAvgRate(), 1, 1)}"></span>
+      </h4>
+      <h5 th:if="${food.getReviewCount() != null}" class="card-subtitle mb-2 text-body-secondary" th:text="${'리뷰 ' + food.getReviewCount() + '개'}"></h5>
+    </div>
+  </div>
+
+  <div class="card mb-2">
+    <div class="card-header">
+      Details
+    </div>
+    <div class="list-group list-group-flush">
+      <div class="list-group-item">
+        <span class="fw-bold">재고</span>
+        <span class="fw-light text-body-secondary" th:text="${food.getStock()}"></span>
+      </div>
+      <div class="list-group-item">
+        <span class="fw-bold">판매 개시일</span>
+        <span class="fw-light text-body-secondary" th:text="${food.getOpened()}"></span>
+      </div>
+      <div class="list-group-item">
+        <span class="fw-bold">판매 기한</span>
+        <span class="fw-light text-body-secondary" th:text="${food.getClose()}"></span>
+      </div>
+      <div class="list-group-item">
+        <span class="fw-bold">게시자</span>
+        <span class="fw-light text-body-secondary" th:text="${food.getRegistrar()}"></span>
+      </div>
+      <div class="list-group-item">
+        <span class="fw-bold">최초 등록일</span>
+        <span class="fw-light text-body-secondary" th:text="${food.getAdded()}"></span>
+      </div>
+      <div th:if="${!food.getUpdated().equals(food.getAdded())}" class="list-group-item">
+        <span class="fw-bold">최종 수정일</span>
+        <span class="fw-light text-body-secondary" th:text="${food.getUpdated()}"></span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h4 class="card-title">Description</h4>
+      <div class="card-text" th:text="${food.getDescription()}"></div>
+    </div>
+    <div th:if="${!#lists.isEmpty(food.getImages())}" class="list-group list-group-flush">
+      <div th:each="image : ${food.getImages()}" class="list-group-item">
+        <img th:src="${image.getSrc()}" th:alt="${image.getName()}"/>
+      </div>
+    </div>
+    <div class="card-footer">
+      <nav class="row justify-content-between">
+        <div class="col-auto">
+          <a th:href="@{'/food/edit/' + ${food.getId()} + ${requestDTO.useQuery()}}" class="btn btn-primary">Edit</a>
+          <a th:href="@{'/food' + ${requestDTO.useQuery()}}" class="btn btn-secondary">Back to List</a>
+        </div>
+        <div class="col-auto">
+          <button id="deleteFood" class="btn btn-danger">Delete</button>
+        </div>
+      </nav>
+    </div>
+  </div>
+  <div class="card mb-2">
+    <div class="card-header">Reviews</div>
+    <div id="reviews-here" class="list-group list-group-flush"></div>
+    <div id="review-paginator-here" class="card-footer"></div>
+  </div>
+  <div class="card mb-5">
+    <div class="card-header">Your Review</div>
+    <form id="review-form">
+      <div class="card-body">
+        <div class="form-floating mb-2">
+          <textarea id="reviewComment" class="form-control" name="comment" placeholder="Comment" style="height: 200px;"></textarea>
+          <label for="reviewComment">Comment</label>
+        </div>
+        <div class="mb-2">
+          <div>Rating</div>
+          <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" name="rating" value="1" id="btnradio1" autocomplete="off">
+            <label class="btn btn-outline-warning" for="btnradio1">1</label>
+            <input type="radio" class="btn-check" name="rating" value="2" id="btnradio2" autocomplete="off">
+            <label class="btn btn-outline-warning" for="btnradio2">2</label>
+            <input type="radio" class="btn-check" name="rating" value="3" id="btnradio3" autocomplete="off">
+            <label class="btn btn-outline-warning" for="btnradio3">3</label>
+            <input type="radio" class="btn-check" name="rating" value="4" id="btnradio4" autocomplete="off">
+            <label class="btn btn-outline-warning" for="btnradio4">4</label>
+            <input type="radio" class="btn-check" name="rating" value="5" id="btnradio5" autocomplete="off" checked>
+            <label class="btn btn-outline-warning" for="btnradio5">5</label>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="card-footer">
+      <button id="submit-review" class="btn btn-primary">Submit</button>
+    </div>
+  </div>
+</div>
+<th:block layout:fragment="script">
+  <script th:src="@{/js/paginator.js}"></script>
+  <script th:src="@{/js/food/review.js}"></script>
+  <script th:inline="javascript">
+    const foodId = /*[[${food.getId()}]]*/ 0;
+    const reviewsHere = document.querySelector('#reviews-here');
+    const reviewPaginator = document.querySelector('#review-paginator-here');
+    const reviewForm = document.querySelector('#review-form');
+    let modalFocusReviewId = null;
+
+    reviewForm.addEventListener('submit', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    })
+
+    function gatherPayload(form) {
+      const fd = new FormData(form);
+      const comment = fd.get("comment")
+      const rating = fd.get("rating")
+      return { comment, rating }
+    }
+
+    async function openModalFor(reviewId) {
+      checkInt(reviewId)
+      try {
+        const response = await axios.get("/api/food/review/" + reviewId);
+        const data = response.data;
+        const rating = data.rating;
+        for (let i = 1; i <= 5; i += 1) {
+          document.getElementById("er" + i).checked = i === rating;
+        }
+        document.getElementById("commentEditTA").value = data.comment
+        modal.show()
+        modalFocusReviewId = reviewId
+      } catch (error) {
+        console.error(error);
+        console.error("There's an error during fetching a review.");
+      }
+    }
+
+
+    document.getElementById('submit-review').addEventListener('click', e => {
+      const { comment, rating } = gatherPayload(reviewForm);
+      registerReview(foodId, comment, rating, "hina").then(response => {
+        document.getElementById('reviewComment').value = "";
+        fetchReviews(reviewsHere, reviewPaginator, foodId);
+        window.alert("Review Submitted");
+      });
+    });
+
+    reviewsHere.addEventListener('click', e => {
+      const review = findReviewEl(e.target);
+      if (review) {
+        openModalFor(review.dataset.foodReviewId)
+      }
+    });
+
+    document.getElementById('reviewEditButton').addEventListener('click', e => {
+      const { comment, rating } = gatherPayload(document.getElementById('reviewEditForm'));
+      editReview(modalFocusReviewId, comment, rating).then(() => {
+        fetchReviews(reviewsHere, reviewPaginator, foodId)
+        modal.hide()
+      })
+    })
+
+    document.getElementById('reviewDeleteButton').addEventListener('click', e => {
+      const sure = window.confirm("Are you sure you want to delete this review?");
+      if (sure) {
+        axios.delete(`/api/food/review/${modalFocusReviewId}`).then(() => {
+          fetchReviews(reviewsHere, reviewPaginator, foodId)
+          modal.hide()
+        })
+      }
+    })
+
+
+    document.getElementById('deleteFood').addEventListener('click', e => {
+      const sure = window.confirm("Are you sure you want to delete this food?");
+      if (sure) {
+        axios.delete("/api/food/delete/" + foodId).then(() => {
+          window.location = "/food" + location.search
+        })
+      }
+    })
+
+
+    const modal = new bootstrap.Modal('#reviewEditModal', {})
+
+    fetchReviews(reviewsHere, reviewPaginator, foodId)
+
+  </script>
+</th:block>

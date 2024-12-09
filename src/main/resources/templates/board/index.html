@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/bootstrap.html}">
+<head>
+  <title>Board</title>
+</head>
+<main class="container" layout:fragment="content">
+  <style>
+    table>tbody>tr>td.board-title-container {
+        padding: 0!important;
+    }
+    table>tbody>tr>td.board-title-container>a {
+        padding: .5rem;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+  </style>
+  <div class="jumbotron display-1 text-center py-4">
+    Board
+  </div>
+  <div class="py-4">
+    <form th:action="@{/board}" method="get">
+      <div class="input-group">
+        <div class="btn-group" role="group" aria-label="Filter Options">
+          <input name="searchFor" value="title" type="checkbox" class="btn-check" id="filterTitle" autocomplete="off" th:checked="${requestDTO.isSearchingFor('title')}">
+          <label class="btn btn-outline-light" for="filterTitle">Title</label>
+          <input name="searchFor" value="content" type="checkbox" class="btn-check" id="filterContent" autocomplete="off" th:checked="${requestDTO.isSearchingFor('content')}">
+          <label class="btn btn-outline-light" for="filterContent">Content</label>
+          <input name="searchFor" value="writer" type="checkbox" class="btn-check" id="filterWriter" autocomplete="off" th:checked="${requestDTO.isSearchingFor('writer')}">
+          <label class="btn btn-outline-light" for="filterWriter" style="border-radius: 0">Writer</label>
+        </div>
+        <input name="search" type="text" class="form-control" placeholder="Search" th:value="${requestDTO.getSearch()}" />
+        <input type="submit" class="btn btn-primary" value="Search" />
+      </div>
+    </form>
+  </div>
+  <div>
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>Title</th>
+        <th>Writer</th>
+        <th scope="col">Created</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="boardItem : ${dto.getDtoList()}">
+        <td class="board-title-container">
+          <a th:href="@{'/board/view/' + ${boardItem.getBid()} + ${requestDTO.useQuery()}}">
+            <span th:text="${boardItem.getTitle()}"></span>
+            <span class="comment-count badge text-bg-primary" th:if="${boardItem.commentCount > 0}" th:text="${boardItem.commentCount}"></span>
+          </a>
+        </td>
+        <td th:text="${boardItem.getUserid()}"></td>
+        <td th:text="${#temporals.format(boardItem.getAdded(), 'yyyy-MM-dd HH:mm')}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <nav>
+    <ul class="pagination justify-content-center">
+      <th:block th:if="${dto.start > 1}">
+        <li class="page-item">
+          <a class="page-link" th:href="@{'/board' + ${requestDTO.useQuery(1)}}">
+            1
+          </a>
+        </li>
+        <li class="page-item disabled">
+          <a class="page-link">
+            &ctdot;
+          </a>
+        </li>
+      </th:block>
+      <th:block th:each="pgIndex: ${#numbers.sequence(dto.start, dto.end)}">
+        <li class="page-item" th:classappend="${dto.page == pgIndex}? 'active'">
+          <a class="page-link" th:href="@{'/board' + ${requestDTO.useQuery(pgIndex)}}" th:text="${pgIndex}"></a>
+        </li>
+      </th:block>
+      <th:block th:if="${dto.end < dto.last}">
+        <li class="page-item disabled">
+          <a class="page-link">
+            &ctdot;
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" th:href="@{'/board' + ${requestDTO.useQuery(dto.last)}}">
+            [[${dto.last}]]
+          </a>
+        </li>
+      </th:block>
+    </ul>
+  </nav>
+  <div class="mt-4 text-center">
+    <a th:href="@{/board/write}">
+      <button type="button" class="btn btn-primary">Write</button>
+    </a>
+  </div>
+</main>
+</html>

@@ -1,4 +1,4 @@
-package dev.nemi.aoharu;
+package dev.nemi.aoharu.service.bucket;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +11,10 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ThymeDTO {
-  private int scalar;
-  private String message;
-  private LocalDateTime chronal;
+public class BucketEditDTO {
+  private Long id;
+  private String title;
+  private String description;
+  private Integer status;
+  private LocalDateTime dueTo;
 }

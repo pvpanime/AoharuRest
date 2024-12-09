@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      layout:decorate="~{layout/bootstrap.html}">
+<head>
+  <title th:text="${board.getTitle()}"></title>
+</head>
+<div class="container" layout:fragment="content">
+  <style>
+      .card.comment .card-body {
+          padding: 0.5rem;
+      }
+
+      .UseTaHeight {
+          height: 240px !important;
+      }
+      #comments-here:empty::after {
+          content: 'No commets here! :o';
+          font-size: 1.5rem;
+          display: block;
+          padding: 1rem;
+          opacity: 0.5;
+      }
+  </style>
+  <div class="modal fade" id="commentEditModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-floating">
+            <textarea id="commentEditTA" class="form-control UseTaHeight" placeholder="Leave a Comment"></textarea>
+            <label for="commentEditTA">Leave a Comment</label>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <div class="col-auto">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button id="commentEditButton" type="button" class="btn btn-primary">Edit</button>
+          </div>
+          <div class="col-auto">
+            <button id="commentDeleteButton" type="button" class="btn btn-danger">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <main class="mb-4">
+    <div class="jumbotron bg-dark text-light text-center py-5">
+      <h1 th:text="${board.getTitle()}" class="display-1"></h1>
+      <div class="text-muted">Added at <span th:text="${#temporals.format(board.getAdded(), 'yyyy-MM-dd HH:mm')}"/>
+      </div>
+      <div th:if="${!board.getAdded().equals(board.getUpdated())}" class="text-muted">*Updated at <span
+        th:text="${#temporals.format(board.getUpdated(), 'yyyy-MM-dd HH:mm')}"/></div>
+    </div>
+    <div id="board-md" class="p-3 rounded card mb-3" th:text="${board.getContent()}"></div>
+  </main>
+  <nav class="mb-4">
+    <div class="d-flex justify-content-between">
+      <div>
+        <a th:href="@{'/board' + ${requestDTO.useQuery()}}" class="btn btn-secondary">Board List</a>
+        <a th:if="${owner}" th:href="@{'/board/edit/' + ${board.getBid()} + ${requestDTO.useQuery()}}" class="btn btn-warning">Edit</a>
+      </div>
+      <button th:if="${owner}" id="DeleteButton" class="btn btn-danger">Delete</button>
+    </div>
+  </nav>
+  <section class="mb-4">
+    <div class="card">
+      <div class="card-header">Comments</div>
+      <ul id="comments-here" class="list-group list-group-flush"></ul>
+      <div id="paginator-here" class="card-body"></div>
+      <div class="card-body">
+<!--/*        <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />*/-->
+        <div class="form-floating">
+          <textarea class="form-control UseTaHeight" placeholder="Write Comment" id="commentTA"></textarea>
+          <label for="commentTA">Write Comment</label>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button id="commentButton" class="btn btn-primary">Comment</button>
+      </div>
+    </div>
+  </section>
+</div>
+<th:block layout:fragment="script">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script th:src="@{/js/paginator.js}"></script>
+  <script th:src="@{/js/board/view.js}"></script>
+  <script th:inline="javascript">
+    const chunk = document.getElementById("board-md").innerHTML;
+    marked.setOptions({
+      breaks: true
+    });
+    document.getElementById('board-md').innerHTML = marked.parse(chunk);
+
+
+    const bid = /*[[${board.getBid()}]]*/ '';
+    const deleteAction = /*[[${deleteAction}]]*/ '';
+    const commentsHere = document.getElementById('comments-here');
+    const commentTA = document.getElementById("commentTA")
+    const commentEditTA = document.getElementById("commentEditTA")
+    const paginator = document.getElementById('paginator-here');
+    let editingCommentId = ''
+    let commentPage = 1
+
+
+    const modal = new bootstrap.Modal('#commentEditModal', {})
+
+    function findComment(target) {
+      while (target != null) {
+        if (target.classList.contains("comment")) return target
+        target = target.parentElement
+      }
+    }
+
+
+    document.getElementById("commentButton").addEventListener("click", e => {
+      const content = commentTA.value
+      // const csrfToken = document.getElementById('csrfToken')
+      axios.post('/api/comment', { bid, content,
+        // [csrfToken.name]: csrfToken.value
+      })
+      .then(() => {
+        fetchComments(bid, commentsHere, paginator)
+        commentTA.value = ''
+      }).catch(err => {
+        window.alert(err)
+      })
+    })
+
+    document.getElementById("commentEditButton").addEventListener("click", e => {
+      axios.put("/api/comment/" + editingCommentId, {
+        content: commentEditTA.value
+      }).then(() => {
+        modal.hide()
+        fetchComments(bid, commentsHere, paginator)
+      }).catch(err => {
+        window.alert(err)
+      })
+    })
+
+    document.getElementById("commentDeleteButton").addEventListener("click", e => {
+      if (window.confirm("Are you sure?")) {
+        axios.delete("/api/comment/" + editingCommentId)
+          .then(() => {
+            modal.hide()
+            fetchComments(bid, commentsHere, paginator)
+          })
+      }
+    })
+
+
+    commentsHere.addEventListener('click', e => {
+      const comment = findComment(e.target)
+      if (comment) {
+        commentEditTA.value = comment.querySelector('.comment-content').innerText
+        editingCommentId = comment.dataset.commentId
+        modal.show()
+      }
+    })
+
+    fetchComments(bid, commentsHere, paginator)
+
+  </script>
+  <script th:if="${owner}" th:inline="javascript">
+    document.getElementById('DeleteButton').addEventListener('click', e => {
+      if (window.confirm('Are you sure you want to delete this board?')) {
+        submitToDelete(deleteAction);
+      }
+    });
+  </script>
+</th:block>
+</html>

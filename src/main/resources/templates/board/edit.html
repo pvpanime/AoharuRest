@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/bootstrap.html}">
+<head>
+  <title>[[${useTitle}]] Board</title>
+</head>
+<div class="container" layout:fragment="content">
+  <main class="py-3">
+  <form th:action="${useAction}" method="POST">
+    <th:block th:if="${requestDTO != null}">
+      <th:block th:each="pair : ${requestDTO.useParams()}">
+        <input type="hidden" th:name="${pair.getFirst()}" th:value="${pair.getSecond()}">
+      </th:block>
+    </th:block>
+    <input th:if="${useEdit}" type="hidden" name="bid" th:value="${board.getBid()}">
+    <div class="card">
+      <div class="card-header" th:text="${useTitle}"></div>
+      <div class="card-body">
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control" id="title" name="title" placeholder="Title" th:value="${board.getTitle()}">
+          <label for="title">Title</label>
+        </div>
+        <div class="form-floating mb-3">
+          <textarea class="form-control" placeholder="" id="contentTA" name="content" th:text="${board.getContent()}" style="height: 360px;"></textarea>
+          <label for="contentTA">Content</label>
+        </div>
+      </div>
+      <div class="card-footer">
+        <input type="submit" class="btn btn-primary" value="Save">
+      </div>
+    </div>
+  </form>
+  </main>
+  <!--/*@thymesVar id="invalid" type="java.util.List<org.springframework.validation.ObjectError>"*/-->
+  <div th:if="${invalid != null}">
+    <div th:each="error : ${invalid}" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <span th:text="${error.getField()}" /> <span th:text="${error.getDefaultMessage()}" />
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+<th:block layout:fragment="script">
+  <!--/*@thymesVar id="invalid" type="java.util.List<org.springframework.validation.ObjectError>"*/-->
+  <script th:if="${invalid != null}" th:inline="javascript">
+    const invalid = /*[[${invalid}]]*/ '';
+  </script>
+</th:block>
+</html>
