@@ -22,9 +22,9 @@ import java.util.Map;
 
 @Log4j2
 @RestController
-@RequestMapping("/api/comment")
+@RequestMapping("/api/boardComment")
 @RequiredArgsConstructor
-public class BoardCommentApiController {
+public class BoardCommentController {
 
   private final BoardCommentService commentService;
 
