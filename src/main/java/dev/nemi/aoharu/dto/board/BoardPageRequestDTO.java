@@ -24,7 +24,7 @@ import java.util.List;
 @NoArgsConstructor
 public class BoardPageRequestDTO implements PageRequestDTO {
 
-  private static final int DEFAULT_PAGE_SIZE = 10;
+  private static final int DEFAULT_PAGE_SIZE = 20;
   public static final String DEFAULT_SIZE_STR = DEFAULT_PAGE_SIZE + "";
   public static final BoardPageRequestDTO DEFAULT = BoardPageRequestDTO.builder().build();
 
@@ -34,7 +34,7 @@ public class BoardPageRequestDTO implements PageRequestDTO {
   private int page = 1;
 
   @Min(1)
-  @Max(100)
+  @Max(200)
   @Positive
   @Builder.Default
   private int size = DEFAULT_PAGE_SIZE;

@@ -7,6 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,8 +18,12 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 @Log4j2
 @Configuration
@@ -41,6 +46,8 @@ public class CustomSecurityConfig {
     );
 
     http.csrf( c -> c.disable() );
+    http.cors( Customizer.withDefaults() );
+
 
     http.rememberMe( re -> {
       re.key("0sdfhiabbioafdonkavsfonkavsdiobnvasdipbnosdv")
@@ -52,8 +59,8 @@ public class CustomSecurityConfig {
 
     http.authorizeHttpRequests(
       auth -> {
-        auth.requestMatchers("/css/**", "/js/**", "/img/**", "/login").permitAll();
-        auth.requestMatchers("/board/write", "/board/edit/*", "/food/register", "/food/edit/*").authenticated();
+//        auth.requestMatchers("/css/**", "/js/**", "/img/**", "/login").permitAll();
+//        auth.requestMatchers("/board/write", "/board/edit/*", "/food/register", "/food/edit/*").authenticated();
 //        auth.anyRequest().authenticated();
         auth.anyRequest().permitAll();
       }
@@ -65,6 +72,20 @@ public class CustomSecurityConfig {
 
     return http.build();
 
+  }
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(List.of("http://localhost:3000")); // Allow React dev server
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+    configuration.setAllowCredentials(true);
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+
+    return source;
   }
 
   @Bean

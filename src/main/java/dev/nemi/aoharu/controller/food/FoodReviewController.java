@@ -26,7 +26,7 @@ public class FoodReviewController {
 
   private final FoodReviewService foodReviewService;
 
-  @Tag(name = "Get reviews for the food of given id.")
+//  @Tag(name = "Get reviews for the food of given id.")
   @GetMapping("/listFor/{foodId}")
   public ResponseEntity<PageResponseDTO<FoodReviewDTO>> getReviewsFor(
     @Valid FoodReviewPageRequestDTO requestDTO,
@@ -38,7 +38,7 @@ public class FoodReviewController {
     return ResponseEntity.ok().body(responseDTO);
   }
 
-  @Tag(name = "Get a review")
+//  @Tag(name = "Get a review")
   @GetMapping("/{reviewId}")
   public ResponseEntity<FoodReviewDTO> getReview(
     @PathVariable long reviewId
@@ -47,7 +47,7 @@ public class FoodReviewController {
     return ResponseEntity.ok().body(dto);
   }
 
-  @Tag(name = "Register a review")
+//  @Tag(name = "Register a review")
   @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Map<String, Object>> register(
     @Valid @RequestBody FoodReviewRegisterDTO dto,
@@ -59,7 +59,7 @@ public class FoodReviewController {
     return ResponseEntity.ok(responseBody);
   }
 
-  @Tag(name = "Edit a review")
+//  @Tag(name = "Edit a review")
   @PutMapping(value = "/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Map<String, Object>> update(
     @Valid @RequestBody FoodReviewEditDTO dto,
@@ -71,7 +71,7 @@ public class FoodReviewController {
     return ResponseEntity.ok(responseBody);
   }
 
-  @Tag(name = "Delete a review")
+//  @Tag(name = "Delete a review")
   @DeleteMapping(value = "/{reviewId}")
   public ResponseEntity<Map<String, Object>> deleteReview(
     @PathVariable long reviewId

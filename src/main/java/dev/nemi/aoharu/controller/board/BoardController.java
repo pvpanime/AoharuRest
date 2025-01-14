@@ -33,7 +33,7 @@ public class BoardController {
     return ResponseEntity.ok(pageResponseDTO);
   }
 
-  @GetMapping(value = "/one/{boardId}")
+  @GetMapping(value = "/view/{boardId}")
   public ResponseEntity<RestResponseDTO<BoardViewDTO>> getOne(@PathVariable long boardId) {
     BoardViewDTO boardViewDTO = boardService.getOne(boardId);
     return RestResponseDTO.ok(boardViewDTO);

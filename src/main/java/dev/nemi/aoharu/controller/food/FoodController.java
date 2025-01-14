@@ -64,7 +64,7 @@ public class FoodController {
     return RestResponseDTO.Void.ok("");
   }
 
-  @Tag(name = "Delete a food")
+//  @Tag(name = "Delete a food")
   @DeleteMapping(value = "/delete/{foodId}")
   public ResponseEntity<Map<String, Object>> deleteFood(
     @PathVariable long foodId
