@@ -1,14 +1,15 @@
 package dev.nemi.aoharu.controller.food;
 
-import dev.nemi.aoharu.dto.*;
+import dev.nemi.aoharu.dto.PageResponseDTO;
 import dev.nemi.aoharu.dto.food.FoodReviewDTO;
 import dev.nemi.aoharu.dto.food.FoodReviewEditDTO;
 import dev.nemi.aoharu.dto.food.FoodReviewPageRequestDTO;
 import dev.nemi.aoharu.dto.food.FoodReviewRegisterDTO;
-import dev.nemi.aoharu.service.food.*;
+import dev.nemi.aoharu.service.food.FoodReviewService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -17,16 +18,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Log4j2
 @RestController
-@RequestMapping("/api/food")
+@RequestMapping("/api/foodReview")
 @RequiredArgsConstructor
-public class FoodApiController {
+public class FoodReviewController {
 
-  private final FoodService foodService;
   private final FoodReviewService foodReviewService;
 
   @Tag(name = "Get reviews for the food of given id.")
-  @GetMapping("/reviews/{foodId}")
+  @GetMapping("/listFor/{foodId}")
   public ResponseEntity<PageResponseDTO<FoodReviewDTO>> getReviewsFor(
     @Valid FoodReviewPageRequestDTO requestDTO,
     BindingResult bindingResult,
@@ -38,7 +39,7 @@ public class FoodApiController {
   }
 
   @Tag(name = "Get a review")
-  @GetMapping("/review/{reviewId}")
+  @GetMapping("/{reviewId}")
   public ResponseEntity<FoodReviewDTO> getReview(
     @PathVariable long reviewId
   ) {
@@ -47,7 +48,7 @@ public class FoodApiController {
   }
 
   @Tag(name = "Register a review")
-  @PostMapping(value = "/review", consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Map<String, Object>> register(
     @Valid @RequestBody FoodReviewRegisterDTO dto,
     BindingResult bindingResult
@@ -59,7 +60,7 @@ public class FoodApiController {
   }
 
   @Tag(name = "Edit a review")
-  @PutMapping(value = "/review", consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(value = "/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Map<String, Object>> update(
     @Valid @RequestBody FoodReviewEditDTO dto,
     BindingResult bindingResult
@@ -71,7 +72,7 @@ public class FoodApiController {
   }
 
   @Tag(name = "Delete a review")
-  @DeleteMapping(value = "/review/{reviewId}")
+  @DeleteMapping(value = "/{reviewId}")
   public ResponseEntity<Map<String, Object>> deleteReview(
     @PathVariable long reviewId
   ) {
@@ -80,13 +81,4 @@ public class FoodApiController {
     return ResponseEntity.ok(responseBody);
   }
 
-  @Tag(name = "Delete a food")
-  @DeleteMapping(value = "/delete/{foodId}")
-  public ResponseEntity<Map<String, Object>> deleteFood(
-    @PathVariable long foodId
-  ) {
-    foodService.delete(foodId);
-    Map<String, Object> responseBody = Map.of("success", true);
-    return ResponseEntity.ok(responseBody);
-  }
 }
