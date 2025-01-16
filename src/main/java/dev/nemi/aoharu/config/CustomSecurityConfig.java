@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -39,12 +40,13 @@ public class CustomSecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-    log.info("----------configure----------");
+//    http.formLogin(
+//      s -> s.loginPage("/login")
+//    );
 
-    http.formLogin(
-      s -> s.loginPage("/login")
-    );
-
+    http.sessionManagement(s -> {
+      s.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    });
     http.csrf( c -> c.disable() );
     http.cors( Customizer.withDefaults() );
 
@@ -62,7 +64,11 @@ public class CustomSecurityConfig {
 //        auth.requestMatchers("/css/**", "/js/**", "/img/**", "/login").permitAll();
 //        auth.requestMatchers("/board/write", "/board/edit/*", "/food/register", "/food/edit/*").authenticated();
 //        auth.anyRequest().authenticated();
-        auth.anyRequest().permitAll();
+        auth
+          .requestMatchers("/api/auth/**").permitAll()
+          .anyRequest().permitAll()
+//          .anyRequest().authenticated()
+        ;
       }
     );
 
@@ -91,7 +97,6 @@ public class CustomSecurityConfig {
   @Bean
   public WebSecurityCustomizer webSecurityCustomizer() {
 
-    log.info("----------web configure----------");
     return web -> web.ignoring().requestMatchers(
       PathRequest.toStaticResources().atCommonLocations()
     );

@@ -57,5 +57,7 @@ public class PageResponseDTO<T> {
 
     }
 
+    page = Math.max(Math.min(page, last), 1);
+
   }
 }
