@@ -18,38 +18,7 @@
 <th:block layout:fragment="style">
 
 </th:block>
-<nav class="navbar navbar-expand bg-body-tertiary sticky-top">
-  <div class="container-fluid">
-    <a class="navbar-brand mb-0 h1" th:href="@{/}" th:text="MySite"></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" th:href="@{/board}">Board</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" th:href="@{/bucket}">BucketList</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" th:href="@{/food}">Food</a>
-        </li>
-      </ul>
-      <th:block sec:authorize="isAuthenticated()">
-        <div class="d-flex gap-1">
-          <span class="text-body-secondary" th:text="${#authentication.principal.username}"></span>
-          <form th:action="@{/logout}" method="POST">
-            <input class="btn btn-outline-light" type="submit" value="Logout">
-          </form>
-        </div>
-      </th:block>
-      <th:block sec:authorize="isAnonymous()">
-        <a class="btn btn-outline-primary" th:href="@{/login}">Login</a>
-      </th:block>
-    </div>
-  </div>
-</nav>
+
 <th:block layout:fragment="content">
 
 </th:block>
