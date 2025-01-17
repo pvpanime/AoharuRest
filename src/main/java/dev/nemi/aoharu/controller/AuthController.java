@@ -1,21 +1,25 @@
 package dev.nemi.aoharu.controller;
 
-import dev.nemi.aoharu.JwtUtils;
+import dev.nemi.aoharu.security.JwtUtils;
 import dev.nemi.aoharu.dto.JwtResponseDTO;
 import dev.nemi.aoharu.dto.LoginRequestDTO;
 import dev.nemi.aoharu.dto.SignupDTO;
 import dev.nemi.aoharu.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Log4j2
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
@@ -44,9 +48,23 @@ public class AuthController {
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     // Generate JWT
-    String jwt = jwtUtils.generateJwt(requestDTO.getUsername());
+    String jwt = jwtUtils.createJwt(authentication);
+    log.info(jwtUtils.getAuthentication(jwt));
     HttpHeaders httpHeaders = new HttpHeaders();
     httpHeaders.add("Authorization", "Bearer " + jwt);
-    return ResponseEntity.ok(new JwtResponseDTO(jwt));
+    return ResponseEntity.ok().headers(httpHeaders).body(new JwtResponseDTO(jwt));
+  }
+
+  @GetMapping("/identify")
+  public ResponseEntity<Map<String, Object>> identify(
+    @AuthenticationPrincipal UserDetails user
+    ) {
+    if (user == null)
+      return ResponseEntity.ok().body(Map.of(
+        "user", ""
+      ));
+    return ResponseEntity.ok().body(Map.of(
+      "user", user.getUsername()
+    ));
   }
 }

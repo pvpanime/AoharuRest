@@ -22,28 +22,22 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String userid) throws UsernameNotFoundException {
-    log.info("loadUserByUsername : {}", userid);
-//
-//    UserDetails userDetails = User.builder().username("user1")
-//      .password(passwordEncoder.encode("ketchup"))
-//      .authorities("ROLE_USER").build();
-//    return userDetails;
+
     Optional<User> result = userRepo.findByUserid(userid);
 
     if (result.isEmpty()) throw new UsernameNotFoundException(userid + " not found");
 
     User user = result.get();
-    UserDTO userDTO = new UserDTO(
+    // it's required here
+
+    return new UserDTO(
       user.getUserid(),
-      user.getPasswd(),
+      user.getPasswd(),  // it's required here
       user.getEmail(),
       user.isDeleted(),
       null,
       user.getRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role.name())).toList()
     );
-
-    log.info("User Security DTO : {}", userDTO);
-    return userDTO;
   }
 
 }
