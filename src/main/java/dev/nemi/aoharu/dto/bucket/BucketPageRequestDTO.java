@@ -1,4 +1,4 @@
-package dev.nemi.aoharu.service.bucket;
+package dev.nemi.aoharu.dto.bucket;
 
 import dev.nemi.aoharu.dto.PageRequestDTO;
 import jakarta.validation.constraints.Max;

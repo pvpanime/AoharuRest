@@ -1,9 +1,6 @@
-package dev.nemi.aoharu.service.bucket;
+package dev.nemi.aoharu.dto.bucket;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -11,10 +8,10 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BucketEditDTO {
-  private Long id;
+public class BucketCreateDTO {
   private String title;
   private String description;
   private Integer status;
+  private String userid;
   private LocalDateTime dueTo;
 }

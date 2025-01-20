@@ -69,7 +69,7 @@
       <tbody>
       <tr th:each="li : ${dto.getDtoList()}">
         <td>
-          <!--/*@thymesVar id="getBadge" type="dev.nemi.aoharu.service.bucket.BucketViewDTO"*/-->
+          <!--/*@thymesVar id="getBadge" type="dev.nemi.aoharu.dto.bucket.BucketViewDTO"*/-->
           <th:block th:switch="${li.getBadge()}">
             <span th:case="${'expired'}" class="badge text-bg-warning" style="vertical-align: text-top">Expired</span>
             <span th:case="${'finished'}" class="badge text-bg-success" style="vertical-align: text-top">Finished</span>

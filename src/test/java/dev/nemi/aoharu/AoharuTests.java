@@ -2,9 +2,9 @@ package dev.nemi.aoharu;
 
 import dev.nemi.aoharu.dto.PageResponseDTO;
 import dev.nemi.aoharu.service.board.BoardService;
-import dev.nemi.aoharu.service.bucket.BucketPageRequestDTO;
+import dev.nemi.aoharu.dto.bucket.BucketPageRequestDTO;
 import dev.nemi.aoharu.service.bucket.BucketService;
-import dev.nemi.aoharu.service.bucket.BucketViewDTO;
+import dev.nemi.aoharu.dto.bucket.BucketViewDTO;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -39,10 +39,10 @@ public class BoardController {
     return RestResponseDTO.ok(boardViewDTO);
   }
 
-//  @PreAuthorize("isAuthenticated()")
+  @PreAuthorize("isAuthenticated()")
   @PostMapping("/write")
   public ResponseEntity<RestResponseDTO<BoardWriteResponseDTO>> write(
-//    @AuthenticationPrincipal UserDetails userDetails,
+    @AuthenticationPrincipal UserDetails userDetails,
     @Valid @RequestBody BoardWriteDTO boardWriteDTO,
     BindingResult boardBR
   ) throws BindException {
@@ -51,8 +51,8 @@ public class BoardController {
     }
 
     if (boardWriteDTO.getUserid() == null)
-//      boardWriteDTO.setUserid(userDetails.getUsername());
-      boardWriteDTO.setUserid("hina");
+      boardWriteDTO.setUserid(userDetails.getUsername());
+//      boardWriteDTO.setUserid("hina");
     Long id = boardService.write(boardWriteDTO);
     if (id != null) {
       return RestResponseDTO.ok(BoardWriteResponseDTO.builder().boardId(id).build());

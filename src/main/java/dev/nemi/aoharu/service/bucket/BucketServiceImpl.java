@@ -1,6 +1,10 @@
 package dev.nemi.aoharu.service.bucket;
 
 import dev.nemi.aoharu.dto.PageResponseDTO;
+import dev.nemi.aoharu.dto.bucket.BucketCreateDTO;
+import dev.nemi.aoharu.dto.bucket.BucketEditDTO;
+import dev.nemi.aoharu.dto.bucket.BucketPageRequestDTO;
+import dev.nemi.aoharu.dto.bucket.BucketViewDTO;
 import dev.nemi.aoharu.prime.Bucket;
 import dev.nemi.aoharu.repository.BucketRepo;
 import jakarta.transaction.Transactional;
@@ -48,15 +52,21 @@ public class BucketServiceImpl implements BucketService {
   }
 
   @Override
-  public void update(BucketEditDTO dto) {
+  public void update(BucketEditDTO dto, String userid) {
     Bucket bucket = repo.findById(dto.getId()).orElseThrow();
+    if (userid == null || !userid.equals(bucket.getUserid()))
+      throw new RuntimeException("Unauthorized");
     bucket.update(dto.getTitle(), dto.getDescription(), dto.getDueTo(), dto.getStatus());
     repo.save(bucket);
   }
 
   @Override
-  public void delete(Long id) {
-    repo.deleteById(id);
+  public void delete(Long id, String userid) {
+    Bucket bucket = repo.findById(id).orElseThrow();
+    if (userid == null || !userid.equals(bucket.getUserid()))
+      throw new RuntimeException("Unauthorized");
+    repo.delete(bucket);
+//    repo.deleteById(id);
   }
 
 }

@@ -1,5 +1,6 @@
 package dev.nemi.aoharu.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -23,6 +24,11 @@ public class PageResponseDTO<T> {
   private int last;
 
   private List<T> dtoList;
+
+  @JsonProperty("success")
+  public boolean getSuccess() {
+    return true;
+  }
 
   @Builder(builderMethodName = "withAll")
   public PageResponseDTO(
