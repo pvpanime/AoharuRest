@@ -24,14 +24,14 @@ public class FoodController {
 
   @GetMapping("/list")
   public
-  ResponseEntity<RestResponseDTO<PageResponseDTO<FoodViewDTO>>>
+  ResponseEntity<PageResponseDTO<FoodViewDTO>>
   getFoods(
     @Valid FoodPageRequestDTO requestDTO,
     BindingResult requestBR
   ) throws BindException {
     if (requestBR.hasErrors()) throw new BindException(requestBR);
     PageResponseDTO<FoodViewDTO> responseDTO = foodService.getFoods(requestDTO);
-    return RestResponseDTO.ok(responseDTO);
+    return ResponseEntity.ok(responseDTO);
   }
 
   @GetMapping("/view/{id}")

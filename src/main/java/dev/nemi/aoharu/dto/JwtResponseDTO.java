@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 public class JwtResponseDTO {
   @JsonProperty
   public boolean success() { return true; }
-  private String token;
+  private String jwt;
 }

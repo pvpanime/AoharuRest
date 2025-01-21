@@ -19,11 +19,11 @@ public class UserServiceImpl implements UserService {
   @Override
   public void insertUser(SignupDTO signupDTO) {
 
-    String userid = signupDTO.getUserid();
+    String userid = signupDTO.getUsername();
     if (userRepo.existsById(userid)) throw new UseridTakenException();
 
     User user = User.builder()
-      .userid(signupDTO.getUserid())
+      .userid(signupDTO.getUsername())
       .passwd(passwordEncoder.encode(signupDTO.getPassword()))
       .email(signupDTO.getEmail())
       .build();

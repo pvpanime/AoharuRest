@@ -46,27 +46,19 @@ public class BoardController {
     @Valid @RequestBody BoardWriteDTO boardWriteDTO,
     BindingResult boardBR
   ) throws BindException {
-    if (boardBR.hasErrors()) {
-      throw new BindException(boardBR);
-    }
-
-    if (boardWriteDTO.getUserid() == null)
-      boardWriteDTO.setUserid(userDetails.getUsername());
-//      boardWriteDTO.setUserid("hina");
+    if (boardBR.hasErrors()) throw new BindException(boardBR);
+    boardWriteDTO.setUserid(userDetails.getUsername());
     Long id = boardService.write(boardWriteDTO);
-    if (id != null) {
-      return RestResponseDTO.ok(BoardWriteResponseDTO.builder().boardId(id).build());
-    } else {
-      throw new RuntimeException("Failed to write");
-    }
+    return RestResponseDTO.ok(BoardWriteResponseDTO.builder().boardId(id).build());
+
   }
 
 
   @PreAuthorize("isAuthenticated()")
   @PostMapping("/edit")
-  public ResponseEntity<RestResponseDTO.Void> edit(
+  public ResponseEntity<RestResponseDTO<BoardWriteResponseDTO>> edit(
     @AuthenticationPrincipal UserDetails userDetails,
-    @Valid BoardEditDTO boardEditDTO,
+    @Valid @RequestBody BoardEditDTO boardEditDTO,
     BindingResult boardBR
   ) throws BindException {
     if (boardBR.hasErrors()) throw new BindException(boardBR);
@@ -74,7 +66,8 @@ public class BoardController {
     BoardViewDTO board = boardService.getOneWithOwnership(userDetails.getUsername(), boardEditDTO.getBid());
     if (board == null) throw new AccessDeniedException("Access denied");
     boardService.edit(boardEditDTO);
-    return RestResponseDTO.Void.ok("");
+    return RestResponseDTO.ok(BoardWriteResponseDTO.builder().boardId(boardEditDTO.getBid()).build());
+
   }
 
   @PreAuthorize("isAuthenticated()")

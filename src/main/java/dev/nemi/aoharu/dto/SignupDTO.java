@@ -2,9 +2,6 @@ package dev.nemi.aoharu.dto;
 
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-
-import java.util.Collection;
 
 @Getter
 @Builder
@@ -14,7 +11,7 @@ import java.util.Collection;
 public class SignupDTO {
 
   @Pattern(regexp = "^[\\w-_]+$")
-  private String userid;
+  private String username;
   private String password;
   private String email;
 

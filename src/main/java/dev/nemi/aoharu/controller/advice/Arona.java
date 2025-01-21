@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -22,12 +23,18 @@ import java.util.NoSuchElementException;
 public class Arona {
 
   @ExceptionHandler(value = { AuthenticationException.class })
-  @ResponseStatus(HttpStatus.UNAUTHORIZED)
-  public ResponseEntity<Map<String, Object>> authenticationFailed(
-    AuthenticationException ae
-  ) {
-    log.info(ae);
+  public ResponseEntity<Map<String, Object>> authenticationFailed() {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+      Map.of(
+        "success", false,
+        "message", "Access Denied"
+      )
+    );
+  }
+
+  @ExceptionHandler(value = { AccessDeniedException.class })
+  public ResponseEntity<Map<String, Object>> forbidden() {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
       Map.of(
         "success", false,
         "message", "Access Denied"
@@ -68,9 +75,15 @@ public class Arona {
 
 
   @ExceptionHandler(Exception.class)
-  public String anyException(Exception ex) {
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseEntity<Map<String, Object>> anyException(Exception ex) {
     Arrays.stream(ex.getStackTrace()).forEach(log::error);
-    return ex.getMessage();
+    return ResponseEntity.internalServerError().body(
+      Map.of(
+        "success", false,
+        "error", ex.getMessage()
+      )
+    );
   }
 }
 

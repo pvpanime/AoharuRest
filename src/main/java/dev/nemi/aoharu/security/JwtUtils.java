@@ -38,6 +38,7 @@ public class JwtUtils {
     String authority = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
     return Jwts.builder()
       .subject(authentication.getName())
+      .header().add("typ","JWT").and()
       .issuedAt(new Date())
       .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
       .claim(AUTHORITIES_KEY, authority)
